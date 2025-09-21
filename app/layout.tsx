@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import MenueBar from "./_components/menuebar";
+import { ClerkProvider } from "@clerk/nextjs";
+
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +28,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <header className="bg-blue-900 text-white text-center p-10">
+          <h1 className="text-5xl">Weather App</h1>
+
+          <div className="text-xl mt-5">
+          <MenueBar/>
+          </div>
+
+      </header>
+
+        <div className="m-10">
         {children}
+        </div>
+
+        <footer className="bg-blue-900 text-white text-center bottom-0 fixed w-full">
+          <h4 className="text-xl">Developed By : Vivek Chauhan </h4>
+        </footer>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

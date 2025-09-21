@@ -1,103 +1,102 @@
-import Image from "next/image";
+'use client';
+import { useUser } from "@clerk/nextjs";
+import React,{ useState ,useEffect } from "react";
+import {insertData,selectData,deleteData} from './dbrelated'
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+const Home=()=>{
+  const[records,setRecords]=useState<{id:number,city:string,temp:number,iconUrl:string}[]>([]);
+   const { isSignedIn, user } = useUser()
+  const[city,setCity]=useState("");
+  const[msg,setMsg]=useState("");
+
+  let email="";
+  if(isSignedIn){
+    email=user.emailAddresses[0].emailAddress;
+  }
+
+  useEffect(()=>{
+  if(isSignedIn){
+             const fetchData=async()=>{
+              const res=await selectData(email);
+              const arr=[];
+               for(const row of res){
+                         const c=row.city;
+                         const URL=`https://api.openweathermap.org/data/2.5/weather?q=${c}&appid=628472ab5d9e03f68262007eabc246cb&units=metric`;
+                         const res=await fetch(URL);
+           
+             
+                         const data =await res.json();
+                         const temp=data.main.temp;
+                         const icon=data.weather[0].icon;
+                       //  console.log(data);
+
+                         const iconUrl=`https://openweathermap.org/img/wn/${icon}@4x.png`;
+                         const obj={id:row.id,city:c,temp,iconUrl};
+                         console.log(obj);
+                         arr.push(obj);
+             
+                                }     
+                                setRecords(arr); 
+                           }
+              fetchData();
+            }
+        },[email,msg]);
+
+   const handleAdd=()=>{
+      insertData(email,city);
+      setCity("");
+      setMsg(""+Math.random());
+  }
+
+  const handleKeyDown=(e:React.KeyboardEvent<HTMLInputElement>)=>{
+      if(e.key==="Enter"){
+        handleAdd();
+      }
+  }
+
+if(!isSignedIn){
+  return<div className="text-5xl text-centre bg-red-500 text-white p-10 m-10">ACCESS DENIED</div>
 }
+
+const handleDel=(id:number)=>{
+    deleteData(id);
+    setMsg(""+Math.random());
+}
+
+
+
+
+
+
+//console.log(user.primaryEmailAddress?.emailAddress);
+
+return(
+  <>
+      Hello,{user.fullName} <br/><br/>
+      Email :{email} <br/><br/>
+       Enter City :<input type="text" value={city} onKeyDown={handleKeyDown} onChange={(e)=>setCity(e.target.value)} className="border-1 border-solid p-1" />
+       <input type="button" value="add" onClick={handleAdd} className="border-1 border-solid m-2 p-1 test-xl w-20" />
+      <br/>
+       {
+        records.map((row,i)=>{return(
+          
+          <div key={i} className="box">
+            <h3 className="text-3xl">{row.city}</h3>
+            <p>
+              {row.temp} <br/>
+             <img src={row.iconUrl} alt={row.city} />
+
+            </p>
+             <p>
+              <input type="button" className="bg-red-500 text-white-bold border-1 border-solid w-10 p-10" value={"X"+row.id} onClick={()=>handleDel(row.id)} />
+             </p>
+
+
+          </div>
+        )})
+       }
+   </>
+     );
+}
+export default Home;
