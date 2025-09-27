@@ -111,29 +111,29 @@ const Home = () => {
   
   if (!isSignedIn) {
     return (
-      <div className="text-center"><h2 className="text-4xl font-bold mb-4">Welcome to the Weather App</h2><p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Please sign in or sign up to continue.</p></div>
+      <div className="text-center"><h2 className="text-3xl md:text-4xl font-bold mb-4">Welcome to the Weather App</h2><p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Please sign in or sign up to continue.</p></div>
     );
   }
 
   return (
     <div className="text-center">
       <CustomAlert message={alertMessage || ""} onClose={() => setAlertMessage(null)} type={alertType} />
-      <h2 className="text-4xl font-bold mb-4">Hello, {user?.fullName}!</h2>
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">Add a city to see the current weather.</p>
-      <div className="flex justify-center mb-4">
-        <input type="text" value={city} onKeyDown={handleKeyDown} onChange={handleInputChange} placeholder="Enter a city name" className="p-3 border-2 border-gray-300 rounded-l-lg w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100" />
-        <button onClick={handleAdd} className="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 transition-colors font-semibold">Add City</button>
+      <h2 className="text-3xl md:text-4xl font-bold mb-2">Hello, {user?.fullName}!</h2>
+      <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8">Add a city to see the current weather.</p>
+      
+      <div className="flex flex-col sm:flex-row justify-center mb-4 max-w-md mx-auto">
+        <input type="text" value={city} onKeyDown={handleKeyDown} onChange={handleInputChange} placeholder="Enter a city name" className="p-3 border-2 border-gray-300 rounded-lg sm:rounded-r-none w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100" />
+        <button onClick={handleAdd} className="mt-2 sm:mt-0 bg-blue-500 text-white p-3 rounded-lg sm:rounded-l-none hover:bg-blue-600 transition-colors font-semibold w-full sm:w-auto">Add City</button>
       </div>
       
       <div className="flex flex-wrap justify-center">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
         ) : records.length === 0 ? (
-          <p className="text-lg text-gray-600 dark:text-gray-300">Your city list is empty. Add a city above!</p>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mt-8">Your city list is empty. Add a city above!</p>
         ) : (
           records.map((row) => (
-            // Card is now a standard div
-            <div key={row.id} className="box relative group flex flex-col justify-between">
+            <div key={row.id} className="box relative group flex flex-col justify-between w-full sm:w-auto">
               <button onClick={() => handleDel(row.id, row.city)} className="absolute top-3 right-3 z-10 bg-red-500 text-white rounded-full h-8 w-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-700" aria-label={`Remove ${row.city}`}>&times;</button>
               
               <div className="text-left">
@@ -147,7 +147,6 @@ const Home = () => {
                 <p className="text-5xl font-light" style={{ color: 'rgb(var(--card-text-primary))' }}>{Math.round(row.temp)}°C</p>
               </div>
               
-              {/* New Forecast Button */}
               <button onClick={() => setSelectedCity(row.city)} className="mt-4 w-full bg-slate-500/20 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 font-semibold py-2 px-4 rounded-lg hover:bg-slate-500/40 dark:hover:bg-slate-600/60 transition-colors flex items-center justify-center gap-2">
                 <span>5-Day Forecast</span>
                 <FiArrowRight />

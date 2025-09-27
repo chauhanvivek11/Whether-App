@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const MenueBar = () => {
     return (
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6 text-sm sm:text-base">
             <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">Home</Link>
             <Link href="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">About</Link>
             <Link href="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">Contact</Link>
@@ -19,7 +19,7 @@ const MenueBar = () => {
                  </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+                  <button className="bg-blue-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold">
                       Sign Up
                   </button>
               </SignUpButton>
