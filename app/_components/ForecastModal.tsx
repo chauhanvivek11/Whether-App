@@ -11,6 +11,27 @@ type ForecastModalProps = {
     onClose: () => void;
 };
 
+// --- Type Definitions for API data ---
+type WeatherEntry = {
+    dt_txt: string;
+    main: {
+        temp: number;
+        humidity: number;
+    };
+    weather: {
+        icon: string;
+        description: string;
+    }[];
+    wind: {
+        speed: number;
+    };
+};
+
+type ApiResponse = {
+    list: WeatherEntry[];
+};
+// ------------------------------------
+
 type DailyForecast = {
     date: string;
     day: string;
@@ -22,11 +43,11 @@ type DailyForecast = {
     wind_speed: number;
 };
 
-// A helper function to process the API data
-const processForecastData = (data: any): DailyForecast[] => {
-    const dailyData: { [key: string]: any[] } = {};
+// Helper function with explicit types
+const processForecastData = (data: ApiResponse): DailyForecast[] => {
+    const dailyData: { [key: string]: WeatherEntry[] } = {};
 
-    data.list.forEach((item: any) => {
+    data.list.forEach((item: WeatherEntry) => {
         const date = item.dt_txt.split(' ')[0];
         if (!dailyData[date]) {
             dailyData[date] = [];
@@ -37,7 +58,7 @@ const processForecastData = (data: any): DailyForecast[] => {
     return Object.keys(dailyData).slice(0, 5).map(date => {
         const dayEntries = dailyData[date];
         const temps = dayEntries.map(e => e.main.temp);
-        const dateObj = new Date(date + 'T12:00:00'); // Use midday to avoid timezone issues
+        const dateObj = new Date(date + 'T12:00:00');
 
         return {
             date: date,
@@ -47,7 +68,7 @@ const processForecastData = (data: any): DailyForecast[] => {
             icon: dayEntries[0].weather[0].icon,
             description: dayEntries[0].weather[0].description,
             humidity: dayEntries[0].main.humidity,
-            wind_speed: Math.round(dayEntries[0].wind.speed * 3.6), // convert m/s to km/h
+            wind_speed: Math.round(dayEntries[0].wind.speed * 3.6),
         };
     });
 };
@@ -65,7 +86,7 @@ const ForecastModal = ({ city, isOpen, onClose }: ForecastModalProps) => {
                 try {
                     const response = await fetch(URL);
                     if (!response.ok) throw new Error('Failed to fetch forecast');
-                    const data = await response.json();
+                    const data: ApiResponse = await response.json(); // Use the type here
                     setForecast(processForecastData(data));
                 } catch (error) {
                     console.error("Forecast fetch error:", error);
@@ -83,18 +104,14 @@ const ForecastModal = ({ city, isOpen, onClose }: ForecastModalProps) => {
                 <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
                 </Transition.Child>
-
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4 text-center">
                         <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
                             <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white/80 dark:bg-slate-900/80 p-6 text-left align-middle shadow-xl transition-all border border-slate-300 dark:border-slate-700">
                                 <Dialog.Title as="h3" className="text-2xl font-bold leading-6 text-gray-900 dark:text-white flex justify-between items-center">
                                     5-Day Forecast for {city}
-                                    <button onClick={onClose} className="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
-                                        <FiX className="h-6 w-6" />
-                                    </button>
+                                    <button onClick={onClose} className="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10"><FiX className="h-6 w-6" /></button>
                                 </Dialog.Title>
-                                
                                 <div className="mt-4">
                                     {isLoading && <div className="flex justify-center items-center h-64"><ImSpinner2 className="h-12 w-12 animate-spin text-blue-500" /></div>}
                                     {forecast && (

@@ -120,12 +120,10 @@ const Home = () => {
       <CustomAlert message={alertMessage || ""} onClose={() => setAlertMessage(null)} type={alertType} />
       <h2 className="text-3xl md:text-4xl font-bold mb-2">Hello, {user?.fullName}!</h2>
       <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8">Add a city to see the current weather.</p>
-      
       <div className="flex flex-col sm:flex-row justify-center mb-4 max-w-md mx-auto">
         <input type="text" value={city} onKeyDown={handleKeyDown} onChange={handleInputChange} placeholder="Enter a city name" className="p-3 border-2 border-gray-300 rounded-lg sm:rounded-r-none w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100" />
         <button onClick={handleAdd} className="mt-2 sm:mt-0 bg-blue-500 text-white p-3 rounded-lg sm:rounded-l-none hover:bg-blue-600 transition-colors font-semibold w-full sm:w-auto">Add City</button>
       </div>
-      
       <div className="flex flex-wrap justify-center">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
@@ -135,18 +133,14 @@ const Home = () => {
           records.map((row) => (
             <div key={row.id} className="box relative group flex flex-col justify-between w-full sm:w-auto">
               <button onClick={() => handleDel(row.id, row.city)} className="absolute top-3 right-3 z-10 bg-red-500 text-white rounded-full h-8 w-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-700" aria-label={`Remove ${row.city}`}>&times;</button>
-              
               <div className="text-left">
                 <h3 className="text-2xl font-bold capitalize truncate w-full" style={{ color: 'rgb(var(--card-text-primary))' }}>{row.city}</h3>
                 <p className="capitalize" style={{ color: 'rgb(var(--card-text-secondary))' }}>{row.description}</p>
               </div>
-              
               <Image src={row.iconUrl} alt={row.description} width={120} height={120} className="mx-auto -my-4"/>
-              
               <div className="text-center">
                 <p className="text-5xl font-light" style={{ color: 'rgb(var(--card-text-primary))' }}>{Math.round(row.temp)}°C</p>
               </div>
-              
               <button onClick={() => setSelectedCity(row.city)} className="mt-4 w-full bg-slate-500/20 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 font-semibold py-2 px-4 rounded-lg hover:bg-slate-500/40 dark:hover:bg-slate-600/60 transition-colors flex items-center justify-center gap-2">
                 <span>5-Day Forecast</span>
                 <FiArrowRight />
@@ -155,7 +149,6 @@ const Home = () => {
           ))
         )}
       </div>
-      
       <ForecastModal isOpen={!!selectedCity} onClose={() => setSelectedCity(null)} city={selectedCity} />
     </div>
   );
